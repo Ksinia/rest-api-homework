@@ -69,19 +69,31 @@ app.get("/movie", (req, res, next) => {
 // read a single movie resource
 app.get("/movie/:id", (req, res, next) => {
   Movie.findByPk(req.params.id)
-    .then(movie => res.send(movie))
+    .then(movie => {
+      movie
+        ? res.send(movie)
+        : res.status(404).send({ message: "id not found" });
+    })
     .catch(next);
 });
 // update a single movie resource
 app.patch("/movie/:id", (req, res, next) => {
   const upd = req.body;
   Movie.update(upd, { where: { id: req.params.id } })
-    .then(number => res.send(number))
+    .then(number => {
+      number[0]
+        ? res.send({ message: `movie ${req.params.id} updated` })
+        : res.status(404).send({ message: "id not found" });
+    })
     .catch(next);
 });
 // delete a single movie resource
 app.delete("/movie/:id", (req, res, next) => {
   Movie.destroy({ where: { id: req.params.id } })
-    .then(number => res.send({ number }))
+    .then(number => {
+      number
+        ? res.send({ message: `movie ${req.params.id} deleted` })
+        : res.status(404).send({ message: "id not found" });
+    })
     .catch(next);
 });
