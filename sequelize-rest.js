@@ -15,29 +15,30 @@ const Movie = db.define("movie", {
 
 db.sync()
   .then(console.log("Database is synced"))
-  .catch(console.error)
   .then(createInitialData())
   .catch(console.error);
 
 function createInitialData() {
-  Movie.findAll().then(data => {
-    data.length === 0 &&
-      Movie.create({
-        title: "Movie 1",
-        yearOfRelease: "1998",
-        synopsis: "Synopsis 1"
-      }) &&
-      Movie.create({
-        title: "Movie 2",
-        yearOfRelease: "1999",
-        synopsis: "Synopsis 2"
-      }) &&
-      Movie.create({
-        title: "Movie 3",
-        yearOfRelease: "2019",
-        synopsis: "Synopsis 3"
-      });
-  });
+  Movie.findAll()
+    .then(data => {
+      data.length === 0 &&
+        Movie.create({
+          title: "Movie 1",
+          yearOfRelease: "1998",
+          synopsis: "Synopsis 1"
+        }) &&
+        Movie.create({
+          title: "Movie 2",
+          yearOfRelease: "1999",
+          synopsis: "Synopsis 2"
+        }) &&
+        Movie.create({
+          title: "Movie 3",
+          yearOfRelease: "2019",
+          synopsis: "Synopsis 3"
+        });
+    })
+    .catch(console.error);
 }
 
 const app = express();
@@ -50,36 +51,35 @@ app.use(bodyparserMiddleware);
 //create a new movie resource
 app.post("/movie", (req, res, next) => {
   Movie.create(req.body)
-    .then(movie => {
-      res.send(movie).catch(error => next(error));
-    })
+    .then(movie => res.send(movie))
     .catch(error => next(error));
 });
 
 // read all movies (the collections resource)
 app.get("/movie", (req, res, next) => {
-  Movie.findAll()
-    .then(movies => {
-      res.send(movies).catch(next);
-    })
+  const limit = Math.min(req.query.limit || 25, 500);
+  const offset = req.query.offset || 0;
+  Movie.findAndCountAll({ limit, offset })
+    .then(result => res.send({ data: result.rows, total: result.count }))
     .catch(next);
 });
+
 // read a single movie resource
 app.get("/movie/:id", (req, res, next) => {
   Movie.findByPk(req.params.id)
-    .then(movie => {
-      res.send(movie).catch(next);
-    })
+    .then(movie => res.send(movie))
     .catch(next);
 });
 // update a single movie resource
-app.put("/movie/:id", (req, res, next) => {
+app.patch("/movie/:id", (req, res, next) => {
   const upd = req.body;
-  const id = req.params.id;
-  Movie.update(upd, { where: { id } })
-    .then(data => {
-      res.send(data).catch(next);
-    })
+  Movie.update(upd, { where: { id: req.params.id } })
+    .then(number => res.send(number))
     .catch(next);
 });
 // delete a single movie resource
+app.delete("/movie/:id", (req, res, next) => {
+  Movie.destroy({ where: { id: req.params.id } })
+    .then(number => res.send({ number }))
+    .catch(next);
+});
