@@ -22,21 +22,23 @@ function createInitialData() {
   Movie.findAll()
     .then(data => {
       data.length === 0 &&
-        Movie.create({
-          title: "Movie 1",
-          yearOfRelease: "1998",
-          synopsis: "Synopsis 1"
-        }) &&
-        Movie.create({
-          title: "Movie 2",
-          yearOfRelease: "1999",
-          synopsis: "Synopsis 2"
-        }) &&
-        Movie.create({
-          title: "Movie 3",
-          yearOfRelease: "2019",
-          synopsis: "Synopsis 3"
-        });
+        Promise.all([
+          Movie.create({
+            title: "Movie 1",
+            yearOfRelease: "1998",
+            synopsis: "Synopsis 1"
+          }),
+          Movie.create({
+            title: "Movie 2",
+            yearOfRelease: "1999",
+            synopsis: "Synopsis 2"
+          }),
+          Movie.create({
+            title: "Movie 3",
+            yearOfRelease: "2019",
+            synopsis: "Synopsis 3"
+          })
+        ]);
     })
     .catch(console.error);
 }
