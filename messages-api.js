@@ -8,9 +8,9 @@ app.listen(port, () => console.log(`Listening on ${port}`));
 
 const bodyparserMiddleware = bodyparser();
 app.use(bodyparserMiddleware);
-// app.use(middleware);
+app.use(middleware);
 
-app.post("/messages", middleware, (req, res) => {
+app.post("/messages", (req, res) => {
   if (!req.body.text) {
     res.status(400).send();
   } else {
