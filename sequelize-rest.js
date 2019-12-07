@@ -45,7 +45,7 @@ const app = express();
 const port = process.env.PORT || 4000;
 app.listen(port, () => console.log(`Listening on ${port}`));
 
-const bodyparserMiddleware = bodyparser();
+const bodyparserMiddleware = bodyparser.json();
 app.use(bodyparserMiddleware);
 
 //create a new movie resource
